@@ -1,11 +1,15 @@
-import mongoose from "mongoose"
-import bcrypt from "bcrypt"
-const { Schema, model } = mongoose
+import mongoose from "mongoose";
+import bcrypt from "bcrypt";
+const { Schema, model } = mongoose;
 
 const userSchema = new Schema(
   {
     password: {
       type: String,
+    },
+    avatar: {
+      type: String,
+      required: true,
     },
     username: {
       type: String,
@@ -21,31 +25,31 @@ const userSchema = new Schema(
   {
     timestamps: true,
   }
-)
+);
 
 userSchema.pre("save", async function (next) {
   if (this.isModified("password")) {
-    this.password = await bcrypt.hash(this.password, 11)
+    this.password = await bcrypt.hash(this.password, 11);
   }
-  next()
-})
+  next();
+});
 userSchema.methods.toJSON = function () {
-  const user = this.toObject()
-  delete user.password
-  delete user.__v
-  return user
-}
+  const user = this.toObject();
+  delete user.password;
+  delete user.__v;
+  return user;
+};
 userSchema.static("checkCredentials", async function (email, password) {
-  const user = await this.findOne({ email })
+  const user = await this.findOne({ email });
   if (user) {
-    const isValid = await bcrypt.compare(password, user.password)
+    const isValid = await bcrypt.compare(password, user.password);
     if (isValid) {
-      return user
+      return user;
     } else {
-      return null
+      return null;
     }
   }
-  return null
-})
+  return null;
+});
 
-export default model("User", userSchema)
+export default model("User", userSchema);
