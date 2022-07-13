@@ -1,4 +1,7 @@
 import { saveMessage } from "../utils/messages.js"
+import express from "express"
+
+const router = express.Router()
 
 let onlineUsers = []
 
@@ -22,21 +25,21 @@ const connectionHandler = (socket) => {
 
     console.log("ROOMS ", socket.rooms)
 
-    // FE is waiting for an event called loggedIn, we gonna emit that and send the list of online users
+    // FE is waiting for an event called loggedin, we gonna emit that and send the list of online users
     socket.emit("loggedIn", onlineUsers)
     // Also the other connected users should receive the list of current online users
     socket.broadcast.emit("newConnection", onlineUsers) // We want to emit this event to every connected socket but not the current one
   })
 
-  socket.on("sendMessage", async ({ message }) => {
+  socket.on("sendMessage", async ({ message, room }) => {
     // we should broadcast that message to everybody but not to the sender of the message (otherwise he would see a duplicated message on the chat)
     // socket.broadcast.emit("message", message)
 
     // we would like to save the message in db
-    await saveMessage(message)
+    await saveMessage(message, room)
 
     // we would like to emit to everybody who is in the room
-    socket.emit("message", message)
+    socket.to(room).emit("message", message)
   })
 
   socket.on("disconnect", () => {
@@ -46,4 +49,8 @@ const connectionHandler = (socket) => {
   })
 }
 
-export default connectionHandler
+router.get("/online-users", (req, res) => {
+  res.send({ onlineUsers })
+})
+
+export { connectionHandler, router }

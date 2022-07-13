@@ -4,8 +4,9 @@ import cors from "cors"
 import mongoose from "mongoose"
 import listEndpoints from "express-list-endpoints"
 import userRouter from "./apis/users/index.js"
+import roomsRouter from "./apis/rooms/index.js"
 import { Server } from "socket.io"
-import connectionHandler from "./socket/index.js"
+import { connectionHandler, router } from "./socket/index.js"
 
 import {
   badRequestHandler,
@@ -24,6 +25,8 @@ server.use(express.json())
 
 // Routes
 server.use("/users", userRouter)
+server.use("/rooms", roomsRouter)
+server.use("/", router)
 
 //error handling
 server.use(badRequestHandler)
