@@ -25,7 +25,7 @@ const connectionHandler = (socket) => {
 
     console.log("ROOMS ", socket.rooms)
 
-    // FE is waiting for an event called loggedin, we gonna emit that and send the list of online users
+    // FE is waiting for an event called loggedIn, we gonna emit that and send the list of online users
     socket.emit("loggedIn", onlineUsers)
     // Also the other connected users should receive the list of current online users
     socket.broadcast.emit("newConnection", onlineUsers) // We want to emit this event to every connected socket but not the current one
